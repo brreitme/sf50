@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SF50 Memory Items</title>
+<style>
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --text: #16191d;
+  --muted: #5d6470;
+  --border: #d9dde3;
+  --accent: #1f5fbf;
+  --accent-text: #ffffff;
+  --good: #1e7a3c;
+  --good-bg: #e3f4e8;
+  --bad: #b3261e;
+  --bad-bg: #fbe5e3;
+  --star: #d99a00;
+  --warn: #c62828;
+  --caution: #b8860b;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111317;
+    --surface: #1b1e24;
+    --surface-2: #252931;
+    --text: #e8eaed;
+    --muted: #9aa1ad;
+    --border: #333843;
+    --accent: #5b9bf0;
+    --accent-text: #0b1220;
+    --good: #5fd08a;
+    --good-bg: #17301f;
+    --bad: #f28b82;
+    --bad-bg: #3a1b19;
+    --star: #f5c04a;
+    --warn: #ff6b6b;
+    --caution: #e5b93c;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+header h1 { font-size: 1.35rem; margin: 4px 0 2px; }
+header p { margin: 0 0 14px; color: var(--muted); font-size: .9rem; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: transparent; color: var(--text); padding: 8px 14px; font: inherit; font-size: .9rem; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button.on { background: var(--accent); color: var(--accent-text); }
+select, .btn {
+  font: inherit; font-size: .9rem; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; cursor: pointer;
+}
+.btn:hover, select:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.btn.good { background: var(--good-bg); color: var(--good); border-color: var(--good); }
+.btn.bad { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+.btn:disabled { opacity: .45; cursor: default; }
+label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: .85rem; color: var(--muted); cursor: pointer; }
+
+.status { display: flex; justify-content: space-between; align-items: center; font-size: .85rem; color: var(--muted); margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+.bar { height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+.bar > div { height: 100%; background: var(--accent); transition: width .2s; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow); padding: 20px; min-height: 260px; position: relative;
+}
+.card.flip { cursor: pointer; }
+.tag { display: inline-block; font-size: .72rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.tag.warning { color: var(--warn); }
+.tag.caution { color: var(--caution); }
+.star {
+  position: absolute; top: 12px; right: 12px; border: 0; background: transparent;
+  font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--muted); padding: 4px;
+}
+.star.on { color: var(--star); }
+.prompt { font-size: 1.3rem; font-weight: 600; margin: 4px 36px 12px 0; }
+.prompt small { display: block; font-size: .85rem; font-weight: 400; color: var(--muted); margin-top: 4px; }
+.answer { border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 14px; }
+.answer .big { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+.hint { color: var(--muted); font-size: .85rem; text-align: center; margin-top: 18px; }
+
+.steps { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9rem; }
+.step { display: flex; gap: 6px; align-items: baseline; padding: 2px 0; }
+.step .n { flex: 0 0 auto; min-width: 1.6em; color: var(--muted); }
+.step .i { flex: 0 1 auto; }
+.step .dots { flex: 1 1 20px; border-bottom: 1px dotted var(--muted); transform: translateY(-4px); min-width: 12px; }
+.step .a { flex: 0 1 auto; text-align: right; font-weight: 700; }
+.step .a.blank { color: var(--accent); }
+.step .a.reveal { color: var(--good); }
+.cond { margin: 6px 0 2px; font-style: italic; }
+.note { font-size: .8rem; color: var(--muted); text-align: center; margin: 6px 0; }
+.note b { display: block; font-size: .72rem; letter-spacing: .06em; }
+
+.opts { display: grid; gap: 10px; margin-top: 8px; }
+.opt {
+  text-align: left; font: inherit; color: var(--text); background: var(--surface-2);
+  border: 2px solid transparent; border-radius: 10px; padding: 12px 14px; cursor: pointer;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt .k { flex: 0 0 auto; font-weight: 700; color: var(--muted); min-width: 1.2em; }
+.opt .body { flex: 1 1 auto; min-width: 0; }
+.opt .steps { font-size: .82rem; }
+.opt.right { border-color: var(--good); background: var(--good-bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt:disabled { cursor: default; }
+
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.nav .mid { display: flex; gap: 10px; }
+.empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+.summary h2 { margin-top: 0; }
+.summary .score { font-size: 2.4rem; font-weight: 800; color: var(--accent); }
+.summary .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+footer { color: var(--muted); font-size: .78rem; margin-top: 22px; text-align: center; }
+footer kbd { border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; font-size: .75rem; }
+
+@media (max-width: 520px) {
+  .prompt { font-size: 1.12rem; }
+  .steps { font-size: .8rem; }
+  .card { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>SF50 Memory Items</h1>
+    <p>Vision Jet Generation 2 — limitations &amp; memory-item procedures (Memory Guide Rev. 7/8).</p>
+  </header>
+
+  <div class="controls">
+    <div class="seg" id="modeSeg">
+      <button data-mode="flash">Flashcards</button>
+      <button data-mode="mc">Multiple choice</button>
+    </div>
+    <select id="deckSel" aria-label="Deck">
+      <option value="all">All questions</option>
+      <option value="limit">Limitations</option>
+      <option value="proc">Procedures (full checklist)</option>
+      <option value="step">Procedure steps</option>
+      <option value="marked">★ Marked for review</option>
+    </select>
+    <select id="topicSel" aria-label="Topic"></select>
+    <button class="btn" id="shuffleBtn" title="Restart with a new random order">↻ Restart</button>
+  </div>
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="autoMark"> Auto-mark questions I miss</label>
+    <button class="btn" id="clearMarks" style="margin-left:auto">Clear all marks</button>
+  </div>
+
+  <div class="status"><span id="progress"></span><span id="score"></span></div>
+  <div class="bar"><div id="barFill"></div></div>
+
+  <div id="stage"></div>
+
+  <footer>
+    Keys: <kbd>Space</kbd> flip · <kbd>←</kbd>/<kbd>→</kbd> prev/next · <kbd>1</kbd>–<kbd>4</kbd> choose · <kbd>M</kbd> mark<br>
+    Study aid only — always refer to the current AFM/POH and checklist.
+  </footer>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Data — limitations (page 1 of the memory guide)
+// [id, topic, prompt, answer, wrong answers]
+// ---------------------------------------------------------------------------
+const LIMITS = [
+  ['w1', 'Weights', 'Max ramp weight', '6040 lb', ['6000 lb', '6100 lb', '5950 lb']],
+  ['w2', 'Weights', 'Max takeoff weight', '6000 lb', ['6040 lb', '5900 lb', '5550 lb']],
+  ['w3', 'Weights', 'Max landing weight', '5550 lb', ['5500 lb', '5700 lb', '4900 lb']],
+  ['w4', 'Weights', 'Max zero fuel weight', '4900 lb', ['5000 lb', '4800 lb', '5550 lb']],
+  ['w5', 'Weights', 'Max baggage', '300 lb', ['250 lb', '200 lb', '350 lb']],
+  ['w6', 'Weights', 'Max cargo — X-Tend', '40 lb', ['25 lb', '50 lb', '60 lb']],
+
+  ['s1', 'Starting', 'Min oil temperature for start', '-40°F/C', ['-22°F/-30°C', '-4°F/-20°C', '32°F/0°C']],
+  ['s2', 'Starting', 'Min temperature for start', '-40°F/C', ['-22°F/-30°C', '-4°F/-20°C', '-65°F/-54°C']],
+  ['s3', 'Starting', 'EPU requirements', '28 V and 800–1000 A', ['24 V and 500–800 A', '28 V and 400–600 A', '28 V and 1000–1200 A']],
+  ['s4', 'Starting', 'Max tailwind for start', '15 knots', ['10 knots', '20 knots', '25 knots']],
+  ['s5', 'Starting', 'Max crosswind for start', '25 knots', ['15 knots', '20 knots', '30 knots']],
+  ['s6', 'Starting', 'In-flight air start envelope', '120–200 KIAS and below 18,000′', ['100–150 KIAS and below 25,000′', '120–200 KIAS and below FL250', '150–210 KIAS and below 18,000′']],
+  ['s7', 'Starting', 'Max starter time per attempted start', '30 seconds on', ['15 seconds on', '45 seconds on', '60 seconds on']],
+  ['s8', 'Starting', 'Starter cool-down after the 1st attempt', '30 seconds off', ['1 minute off', '2 minutes off', '5 minutes off']],
+  ['s9', 'Starting', 'Starter cool-down after the 2nd attempt', '5 minutes off', ['30 seconds off', '10 minutes off', '15 minutes off']],
+  ['s10', 'Starting', 'Starter cool-down after the 3rd attempt', '30 minutes off', ['10 minutes off', '15 minutes off', '60 minutes off']],
+  ['s11', 'Starting', 'Required after a failed start', 'External check', ['Dry motor for 30 seconds', 'Fuel sample from all drains', 'Nothing — retry immediately']],
+
+  ['f1', 'Fuel', 'Approved fuels', 'Jet A, Jet A-1, JP-8', ['Jet A, Jet B, JP-4', 'Jet A only', 'Jet A, JP-5, 100LL']],
+  ['f2', 'Fuel', 'Fuel weight used for Jet A', '6.76 lb/gal', ['6.0 lb/gal', '6.5 lb/gal', '7.1 lb/gal']],
+  ['f3', 'Fuel', 'Usable fuel', '296 gal', ['286 gal', '300 gal', '316 gal']],
+  ['f4', 'Fuel', 'Max allowable fuel imbalance', '15 gal', ['10 gal', '20 gal', '25 gal']],
+  ['f5', 'Fuel', 'Min fuel temperature', '-40°F/C', ['-22°F/-30°C', '-4°F/-20°C', '-65°F/-54°C']],
+  ['f6', 'Fuel', 'Max fuel temperature', '122°F/50°C', ['104°F/40°C', '131°F/55°C', '140°F/60°C']],
+
+  ['e1', 'Engine', 'Engine model and thrust', 'Williams FJ33-5A — 1846 lb', ['Williams FJ33-5A — 2000 lb', 'Williams FJ33-4A — 1846 lb', 'Williams FJ44-1A — 1965 lb']],
+  ['e2', 'Engine', 'Approved engine oil', 'Mobil Jet II / Mobil 254', ['AeroShell 500 / 560', 'Mobil Jet Oil 387', 'AeroShell 15W-50']],
+  ['e3', 'Engine', 'Total oil capacity', '3 quarts', ['2.2 quarts', '4 quarts', '5 quarts']],
+  ['e4', 'Engine', 'Oil quantity to the full line', '2.2 quarts', ['3 quarts', '1.5 quarts', '2.5 quarts']],
+
+  ['t1', 'Takeoff & Landing', 'Max tailwind for takeoff and landing', '10 knots', ['5 knots', '15 knots', '20 knots']],
+  ['t2', 'Takeoff & Landing', 'Max demonstrated crosswind — Flaps 50%', '18 knots', ['16 knots', '20 knots', '15 knots']],
+  ['t3', 'Takeoff & Landing', 'Max demonstrated crosswind — Flaps 100%', '16 knots', ['18 knots', '14 knots', '20 knots']],
+  ['t4', 'Takeoff & Landing', 'Max airport elevation', '10,000′ MSL', ['8,000′ MSL', '12,000′ MSL', '14,000′ MSL']],
+  ['t5', 'Takeoff & Landing', 'Min airport elevation', '-1,000′ MSL', ['0′ MSL', '-500′ MSL', '-2,000′ MSL']],
+  ['t6', 'Takeoff & Landing', 'Min takeoff temperature', '-40°F/C', ['-22°F/-30°C', '-4°F/-20°C', '-65°F/-54°C']],
+  ['t7', 'Takeoff & Landing', 'Max takeoff temperature', '122°F/50°C', ['104°F/40°C', '113°F/45°C', '131°F/55°C']],
+  ['t8', 'Takeoff & Landing', 'Approved takeoff flap setting', 'Flaps 50% only', ['Flaps UP or 50%', 'Flaps 50% or 100%', 'Any flap setting']],
+
+  ['g1', 'Operating Limitations', 'V<sub>MO</sub>', '250 KIAS', ['230 KIAS', '260 KIAS', '270 KIAS']],
+  ['g2', 'Operating Limitations', 'M<sub>MO</sub>', '0.53 Mach', ['0.50 Mach', '0.55 Mach', '0.60 Mach']],
+  ['g3', 'Operating Limitations', 'V<sub>O</sub> (operating maneuvering speed)', '150 KIAS', ['140 KIAS', '160 KIAS', '175 KIAS']],
+  ['g4', 'Operating Limitations', 'Max duration for takeoff thrust', '5 minutes', ['2 minutes', '3 minutes', '10 minutes']],
+  ['g5', 'Operating Limitations', 'Max operating altitude', 'FL310', ['FL280', 'FL300', 'FL350']],
+  ['g6', 'Operating Limitations', 'Min operating temperature at FL310', '-82°F/-63°C', ['-65°F/-54°C', '-94°F/-70°C', '-76°F/-60°C']],
+  ['g7', 'Operating Limitations', 'Min operating temperature at FL200', '-65°F/-54°C', ['-82°F/-63°C', '-40°F/C', '-58°F/-50°C']],
+  ['g8', 'Operating Limitations', 'Cool-down after a high-energy landing event', '30 minutes', ['15 minutes', '45 minutes', '60 minutes']],
+  ['g9', 'Operating Limitations', 'V<sub>FE</sub> — Flaps 50%', '190 KIAS', ['150 KIAS', '180 KIAS', '210 KIAS']],
+  ['g10', 'Operating Limitations', 'V<sub>FE</sub> — Flaps 100%', '150 KIAS', ['130 KIAS', '160 KIAS', '190 KIAS']],
+  ['g11', 'Operating Limitations', 'V<sub>LO</sub> — Extend', '210 KIAS', ['150 KIAS', '190 KIAS', '250 KIAS']],
+  ['g12', 'Operating Limitations', 'V<sub>LO</sub> — Retract', '150 KIAS', ['130 KIAS', '190 KIAS', '210 KIAS']],
+  ['g13', 'Operating Limitations', 'V<sub>LE</sub>', '210 KIAS', ['150 KIAS', '190 KIAS', '250 KIAS']],
+  ['g14', 'Operating Limitations', 'Max cabin pressure differential', '7.1 psid', ['6.5 psid', '7.5 psid', '8.1 psid']],
+
+  ['a1', 'AFCS', 'Min autopilot speed — Flaps 100%', '85 KIAS', ['80 KIAS', '90 KIAS', '95 KIAS']],
+  ['a2', 'AFCS', 'Min autopilot speed — Flaps 50%', '95 KIAS', ['85 KIAS', '100 KIAS', '105 KIAS']],
+  ['a3', 'AFCS', 'Min autopilot speed — Flaps UP', '105 KIAS', ['95 KIAS', '110 KIAS', '120 KIAS']],
+  ['a4', 'AFCS', 'Min autopilot engagement altitude', '400′ AGL', ['200′ AGL', '500′ AGL', '1000′ AGL']],
+  ['a5', 'AFCS', 'Autopilot disconnect altitude — visual approach', '1000′ AGL', ['200′ AGL', '400′ AGL', '500′ AGL']],
+  ['a6', 'AFCS', 'Min autopilot disconnect altitude — instrument approach', 'Minimums', ['200′ AGL', '400′ AGL', '1000′ AGL']],
+
+  ['i1', 'Icing', 'Usable IPS fluid', '3.0 gal', ['2.0 gal', '3.5 gal', '4.0 gal']],
+  ['i2', 'Icing', 'Min IPS fluid dispatch quantity', '1.0 gal', ['0.5 gal', '1.5 gal', '2.0 gal']],
+  ['i3', 'Icing', 'Min windshield IPS temperature', '-22°F/-30°C', ['-40°F/C', '-4°F/-20°C', '-13°F/-25°C']],
+  ['i4', 'Icing', 'Min wing/stab IPS temperature', '-40°F/C', ['-22°F/-30°C', '-4°F/-20°C', '-65°F/-54°C']],
+  ['i5', 'Icing', 'Min airspeed in icing', '160 KIAS', ['140 KIAS', '150 KIAS', '170 KIAS']],
+  ['i6', 'Icing', 'Max flap deflection with ice accretion', 'Flaps 50%', ['Flaps UP', 'Flaps 100%', 'No restriction']],
+  ['i7', 'Icing', 'Max duty cycle for windshield IPS', '10 sec on, 10 sec off', ['30 sec on, 30 sec off', '5 sec on, 10 sec off', '10 sec on, 30 sec off']],
+  ['i8', 'Icing', 'Tactile (wing) inspection required within…', '5 minutes before departure', ['10 minutes before departure', '15 minutes before departure', '30 minutes before departure']],
+  ['i9', 'Icing', 'Max continuous probe heat on the ground', '5 minutes', ['2 minutes', '10 minutes', '15 minutes']],
+];
+
+// ---------------------------------------------------------------------------
+// Data — Generation 2 memory-item procedures (page 3 of the memory guide)
+// step: {n, i, a} item/action · {n, i, a, inline} rendered "item action" · {n, t} text
+//       {cond} conditional line · {caution} / {note}
+// ---------------------------------------------------------------------------
+const PROCS = [
+  { id: 'afcs', topic: 'Emergency Procedures', title: 'AFCS Malfunction', sub: 'Stick pusher, ESP, USP, autopilot', steps: [
+    { n: '1', i: 'AP DISC Button', a: 'PRESS AND HOLD' },
+    { n: '2', i: 'AP SERVOS CB (A3)', a: 'PULL' } ] },
+  { id: 'engvr', topic: 'Emergency Procedures', title: 'Engine Emergency on Takeoff', sub: 'Speed below V<sub>R</sub>', steps: [
+    { n: '1', i: 'Brakes', a: 'MAX PILOT EFFORT W/O SKIDDING' },
+    { n: '2', i: 'Thrust Lever', a: 'IDLE' } ] },
+  { id: 'firelow', topic: 'Emergency Procedures', title: 'Engine Fire on Takeoff', sub: 'Low altitude', steps: [
+    { n: '1', t: 'Land as soon as possible.' } ] },
+  { id: 'faillow', topic: 'Emergency Procedures', title: 'Engine Failure on Takeoff', sub: 'Low altitude', steps: [
+    { n: '1', i: 'Best Glide or Landing Speed', a: '100 KIAS' },
+    { n: '2', t: 'Land straight ahead.' } ] },
+  { id: 'rto', topic: 'Emergency Procedures', title: 'Rejected Takeoff', sub: '', steps: [
+    { n: '1', i: 'Brakes', a: 'MAX PILOT EFFORT W/O SKIDDING' },
+    { n: '2', i: 'Thrust Lever', a: 'IDLE' } ] },
+  { id: 'failflt', topic: 'Emergency Procedures', title: 'Engine Failure in Flight', sub: '', steps: [
+    { n: '1', i: 'Pitch for air start', a: 'AIRSPEED 120 - 200 KIAS' },
+    { n: '2', t: 'Turn toward possible landing site(s).' } ] },
+  { id: 'caps', topic: 'Emergency Procedures', title: 'CAPS Activation', sub: '', steps: [
+    { n: '1', i: 'Activation Handle', a: 'PULL DOWN STEADILY WITH BOTH HANDS' } ] },
+  { id: 'burst', topic: 'Emergency Procedures', title: 'Uncontained Engine Failure', sub: 'Rotor burst in flight', steps: [
+    { n: '1', i: 'Pitch for', a: '120 KIAS (APPROX.)', inline: true },
+    { n: '2', t: 'Turn toward possible landing site(s).' } ] },
+  { id: 'abort', topic: 'Emergency Procedures', title: 'Aborted Engine Start', sub: '', steps: [
+    { n: '1', i: 'Engine Knob', a: 'OFF' },
+    { n: '2', i: 'Engine Button', a: 'PRESS AND HOLD 15 - 30 SECONDS' } ] },
+  { id: 'smoke', topic: 'Emergency Procedures', title: 'Smoke Removal', sub: '', steps: [
+    { n: '1', i: 'Oxygen Mask', a: 'DON, EMER' },
+    { n: '2', i: 'Smoke Goggles (if equipped)', a: 'DON' },
+    { n: '3', i: 'PAX OXY DEPLOY Switch', a: 'ON' } ] },
+  { id: 'cabfire', topic: 'Emergency Procedures', title: 'Cabin Fire in Flight', sub: '', steps: [
+    { n: '1', i: 'Oxygen Mask', a: 'DON, EMER' },
+    { n: '2', i: 'Smoke Goggles (if equipped)', a: 'DON' },
+    { n: '3', i: 'PAX OXY DEPLOY Switch', a: 'ON' } ] },
+  { id: 'emerdes', topic: 'Emergency Procedures', title: 'Emergency Descent', sub: '', steps: [
+    { n: '1', i: 'Thrust Lever', a: 'IDLE' },
+    { n: '2', i: 'Pitch', a: '-20° (APPROX.)' },
+    { n: '3', i: 'Airspeed', a: 'INCREASE TO V<sub>MO</sub> (250 KIAS) / M<sub>MO</sub> (0.53 Mach) MAXIMUM' } ] },
+  { id: 'egress', topic: 'Emergency Procedures', title: 'Emergency Ground Egress', sub: '', steps: [
+    { n: '1', i: 'Engine Knob', a: 'OFF' },
+    { n: '2', i: 'Engine Button', a: 'PRESS (MOMENTARY)' },
+    { n: '3', i: 'BAT 1 and BAT 2 Switches', a: 'OFF' },
+    { n: '4', i: 'Parking Brake', a: 'SET' } ] },
+
+  { id: 'cabalt', topic: 'Warnings', title: 'CABIN ALTITUDE HIGH', sub: 'Warning', steps: [
+    { n: '1', i: 'Oxygen Mask', a: 'DON, 100%' } ] },
+  { id: 'capsact', topic: 'Warnings', title: 'CAPS ACTIVATED', sub: 'Warning', steps: [
+    { cond: 'If message is displayed but CAPS handle is NOT pulled:' },
+    { n: 'a.', i: 'AP DISC Button', a: 'PRESS AND HOLD 5 SECONDS' } ] },
+  { id: 'firewarn', topic: 'Warnings', title: 'ENGINE FIRE', sub: 'Warning — in flight', steps: [
+    { n: '1', i: 'Thrust Lever', a: 'IDLE' },
+    { n: '2', i: 'Pitch for', a: '120 KIAS (APPROX.)', inline: true },
+    { n: '3', i: 'Wait', a: '15 seconds', inline: true },
+    { cond: 'If ENGINE FIRE warning remains on, or secondary fire indications are present — probable engine fire:' },
+    { n: 'a.', i: 'ENGINE FIRE ACKNOWLEDGE Switch', a: 'LIFT GUARD, TOGGLE' },
+    { n: 'b.', i: 'Left or Right PUSH TO DISCHARGE Button', a: 'PUSH' } ] },
+  { id: 'stall', topic: 'Warnings', title: 'STALL WARNING', sub: 'Warning', steps: [
+    { n: '1', i: 'AOA', a: 'REDUCE' },
+    { n: '2', i: 'Thrust Lever', a: 'T/O' } ] },
+  { id: 'trim', topic: 'Warnings', title: 'TAKEOFF PITCH TRIM', sub: 'Warning — on ground', steps: [
+    { n: '1', i: 'Takeoff', a: 'ABORT' } ] },
+  { id: 'diff', topic: 'Warnings', title: 'CABIN DIFF PRESSURE HIGH', sub: 'Warning', steps: [
+    { n: '1', i: 'BLEED Switch', a: 'FRESH' } ] },
+  { id: 'firegnd', topic: 'Warnings', title: 'ENGINE FIRE', sub: 'Warning — on ground', steps: [
+    { n: '1', i: 'ENGINE FIRE ACKNOWLEDGE Switch', a: 'LIFT GUARD, TOGGLE' },
+    { n: '2', i: 'Left or Right PUSH TO DISCHARGE Button', a: 'PUSH' },
+    { n: '3', t: 'Evacuate airplane.' } ] },
+  { id: 'pusher', topic: 'Warnings', title: 'STICK PUSHER', sub: 'Warning', steps: [
+    { n: '1', i: 'AOA', a: 'REDUCE' },
+    { n: '2', i: 'Thrust Lever', a: 'T/O' },
+    { caution: 'Do not attempt to overpower the stick pusher.' },
+    { note: 'If airspeed, altitude, power settings, and load factors are within normal limits, and there is no evidence of ice contamination, message should be considered a malfunction.' },
+    { cond: 'If message is determined to be a malfunction:' },
+    { n: 'a.', i: 'AP DISC Button', a: 'PRESS AND HOLD' },
+    { n: 'b.', i: 'AP SERVOS CB (A3)', a: 'PULL' } ] },
+  { id: 'autoland', topic: 'Warnings', title: 'EMER AUTOLAND ACTIVATING', sub: 'Warning', steps: [
+    { cond: 'If Safe Return Autoland activation is not desired:' },
+    { n: 'a.', i: 'AP DISC Button', a: 'PRESS AND HOLD 1 SECOND' } ] },
+  { id: 'startn1', topic: 'Warnings', title: 'ENGINE START N1', sub: 'Warning', steps: [
+    { n: '', i: 'ENGINE START N1', a: 'ABORT START' } ] },
+
+  { id: 'ips', topic: 'Cautions', title: 'IPS ENG INLET UNDERPRESS', sub: 'Caution', steps: [
+    { n: '1', i: 'ENGINE IPS Switch', a: 'CYCLE OFF, WITHIN < 1 SEC' } ] },
+  { id: 'sfd', topic: 'Cautions', title: 'SFD ALT / IAS / ROLL / PITCH', sub: 'Caution', steps: [
+    { n: '1', i: 'DISPLAY BACKUP Button', a: 'SELECT' } ] },
+];
+
+// Plausible actions per checklist item, used to build wrong answers.
+const POOLS = {
+  'Thrust Lever': ['IDLE', 'T/O', 'MCT', 'CLIMB'],
+  'Brakes': ['MAX PILOT EFFORT W/O SKIDDING', 'AS REQUIRED', 'LIGHT, INTERMITTENT', 'PARKING BRAKE SET'],
+  'AP DISC Button': ['PRESS AND HOLD', 'PRESS AND RELEASE', 'PRESS AND HOLD 1 SECOND', 'PRESS AND HOLD 5 SECONDS'],
+  'AP SERVOS CB (A3)': ['PULL', 'RESET', 'CYCLE', 'PUSH IN'],
+  'Oxygen Mask': ['DON, 100%', 'DON, EMER', 'DON, NORMAL', 'DON, DILUTE'],
+  'Smoke Goggles (if equipped)': ['DON', 'STOW', 'REMOVE'],
+  'PAX OXY DEPLOY Switch': ['ON', 'OFF', 'AUTO'],
+  'Engine Knob': ['OFF', 'ON', 'AUTO'],
+  'Engine Button': ['PRESS AND HOLD 15 - 30 SECONDS', 'PRESS (MOMENTARY)', 'PRESS AND HOLD 5 SECONDS', 'DO NOT PRESS'],
+  'BAT 1 and BAT 2 Switches': ['OFF', 'ON', 'BAT 1 ON, BAT 2 OFF'],
+  'Parking Brake': ['SET', 'RELEASE'],
+  'Pitch': ['-20° (APPROX.)', '-10° (APPROX.)', '-30° (APPROX.)', '-5° (APPROX.)'],
+  'Airspeed': ['INCREASE TO V<sub>MO</sub> (250 KIAS) / M<sub>MO</sub> (0.53 Mach) MAXIMUM', 'MAINTAIN 120 KIAS', 'INCREASE TO V<sub>LE</sub> (210 KIAS) MAXIMUM', 'REDUCE TO V<sub>O</sub> (150 KIAS)'],
+  'Best Glide or Landing Speed': ['100 KIAS', '90 KIAS', '110 KIAS', '120 KIAS'],
+  'Pitch for air start': ['AIRSPEED 120 - 200 KIAS', 'AIRSPEED 100 - 150 KIAS', 'AIRSPEED 150 - 210 KIAS', 'AIRSPEED 100 KIAS'],
+  'Pitch for': ['120 KIAS (APPROX.)', '100 KIAS (APPROX.)', '150 KIAS (APPROX.)', 'V<sub>MO</sub>'],
+  'Wait': ['15 seconds', '5 seconds', '30 seconds', '60 seconds'],
+  'Activation Handle': ['PULL DOWN STEADILY WITH BOTH HANDS', 'PULL SHARPLY WITH ONE HAND', 'ROTATE AND PULL', 'PULL DOWN AND HOLD 5 SECONDS'],
+  'ENGINE FIRE ACKNOWLEDGE Switch': ['LIFT GUARD, TOGGLE', 'PRESS', 'OFF', 'PRESS AND HOLD 2 SECONDS'],
+  'Left or Right PUSH TO DISCHARGE Button': ['PUSH', 'PUSH BOTH', 'PUSH AND HOLD 5 SECONDS'],
+  'AOA': ['REDUCE', 'INCREASE', 'MAINTAIN'],
+  'Takeoff': ['ABORT', 'CONTINUE', 'CONTINUE, TRIM AS REQUIRED'],
+  'BLEED Switch': ['FRESH', 'OFF', 'NORM', 'RECIRC'],
+  'ENGINE START N1': ['ABORT START', 'CONTINUE START', 'MONITOR'],
+  'ENGINE IPS Switch': ['CYCLE OFF, WITHIN < 1 SEC', 'OFF', 'ON', 'CYCLE OFF FOR 10 SEC'],
+  'DISPLAY BACKUP Button': ['SELECT', 'DESELECT', 'PRESS AND HOLD'],
+};
+
+// ---------------------------------------------------------------------------
+// Question bank
+// ---------------------------------------------------------------------------
+const QUESTIONS = [];
+for (const [id, topic, prompt, answer, wrong] of LIMITS) {
+  QUESTIONS.push({ id: 'L-' + id, kind: 'limit', topic, prompt, answer, wrong });
+}
+for (const p of PROCS) {
+  QUESTIONS.push({ id: 'P-' + p.id, kind: 'proc', topic: p.topic, proc: p });
+  p.steps.forEach((s, idx) => {
+    if (!s.i || !POOLS[s.i]) return;
+    QUESTIONS.push({
+      id: `S-${p.id}-${idx}`, kind: 'step', topic: p.topic, proc: p, stepIdx: idx,
+      answer: s.a, wrong: POOLS[s.i].filter(x => x !== s.a),
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Storage (all access guarded — storage may be unavailable)
+// ---------------------------------------------------------------------------
+const MARK_KEY = 'sf50.marked.v1';
+const PREF_KEY = 'sf50.prefs.v1';
+function load(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+let marked = new Set(load(MARK_KEY, []));
+const prefs = Object.assign({ mode: 'flash', deck: 'all', topic: 'all', autoMark: false }, load(PREF_KEY, {}));
+function saveMarks() { save(MARK_KEY, [...marked]); }
+function savePrefs() { save(PREF_KEY, prefs); }
+function toggleMark(id, force) {
+  const on = force ?? !marked.has(id);
+  on ? marked.add(id) : marked.delete(id);
+  saveMarks();
+  updateDeckLabel();
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+const $ = s => document.querySelector(s);
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function stepsSig(steps) {
+  return steps.filter(s => s.n !== undefined).map(s => (s.i || '') + '|' + (s.a || s.t || '')).join('||');
+}
+function renderSteps(steps, { blank = -1, reveal = false, compact = false } = {}) {
+  return '<div class="steps">' + steps.map((s, idx) => {
+    if (s.cond) return `<div class="cond">◆ ${s.cond}</div>`;
+    if (s.caution) return compact ? '' : `<div class="note"><b>• CAUTION •</b>${s.caution}</div>`;
+    if (s.note) return compact ? '' : `<div class="note"><b>• NOTE •</b>${s.note}</div>`;
+    const n = `<span class="n">${s.n}${/^\d+$/.test(s.n) ? '.' : ''}</span>`;
+    if (s.t) return `<div class="step">${n}<span class="i">${s.t}</span></div>`;
+    let a = s.a, cls = 'a';
+    if (idx === blank) { a = reveal ? s.a : '?????'; cls += reveal ? ' reveal' : ' blank'; }
+    if (s.inline) return `<div class="step">${n}<span class="i">${s.i} <span class="${cls}">${a}</span></span></div>`;
+    return `<div class="step">${n}<span class="i">${s.i}</span><span class="dots"></span><span class="${cls}">${a}</span></div>`;
+  }).join('') + '</div>';
+}
+function procHeading(p) {
+  const tagCls = p.topic === 'Warnings' ? 'warning' : p.topic === 'Cautions' ? 'caution' : '';
+  return { tagCls, title: p.title + (p.sub ? `<small>${p.sub}</small>` : '') };
+}
+
+// Wrong checklists for a procedure: mutate the real one (wrong action, swapped
+// order, missing step), then fall back to other procedures.
+function procDistractors(p) {
+  const real = stepsSig(p.steps);
+  const cands = [];
+  p.steps.forEach((s, idx) => {
+    if (!s.i || !POOLS[s.i]) return;
+    for (const w of POOLS[s.i]) {
+      if (w === s.a) continue;
+      cands.push(p.steps.map((x, j) => j === idx ? { ...x, a: w } : x));
+    }
+  });
+  const numbered = p.steps.map((s, i) => s.n !== undefined ? i : -1).filter(i => i >= 0);
+  for (let k = 0; k + 1 < numbered.length; k++) {
+    const a = numbered[k], b = numbered[k + 1];
+    const copy = p.steps.slice();
+    copy[a] = { ...p.steps[b], n: p.steps[a].n };
+    copy[b] = { ...p.steps[a], n: p.steps[b].n };
+    cands.push(copy);
+  }
+  if (numbered.length > 1) {
+    const drop = numbered[Math.floor(Math.random() * numbered.length)];
+    const copy = p.steps.filter((_, i) => i !== drop);
+    let c = 0;
+    cands.push(copy.map(s => s.n !== undefined && /^\d+$/.test(s.n) ? { ...s, n: String(++c) } : s));
+  }
+  const picked = [], seen = new Set([real]);
+  for (const c of shuffle(cands)) {
+    const sig = stepsSig(c);
+    if (seen.has(sig)) continue;
+    seen.add(sig); picked.push(c);
+    if (picked.length === 3) break;
+  }
+  for (const o of shuffle(PROCS)) {
+    if (picked.length === 3) break;
+    const sig = stepsSig(o.steps);
+    if (seen.has(sig)) continue;
+    seen.add(sig); picked.push(o.steps);
+  }
+  return picked;
+}
+
+function buildOptions(q) {
+  if (q.kind === 'proc') {
+    const opts = [{ html: renderSteps(q.proc.steps, { compact: true }), correct: true }]
+      .concat(procDistractors(q.proc).map(st => ({ html: renderSteps(st, { compact: true }), correct: false })));
+    return shuffle(opts);
+  }
+  const wrong = shuffle(q.wrong).slice(0, 3);
+  return shuffle([{ html: q.answer, correct: true }, ...wrong.map(w => ({ html: w, correct: false }))]);
+}
+
+// ---------------------------------------------------------------------------
+// Session state
+// ---------------------------------------------------------------------------
+let S = null;
+
+function deckQuestions(deck, topic) {
+  // Flashcards ask each procedure once by title, so step questions are left out;
+  // a marked step brings its procedure's card into the marked deck instead.
+  const flash = prefs.mode === 'flash';
+  let qs = QUESTIONS;
+  if (deck === 'marked') qs = qs.filter(q => marked.has(q.id) ||
+    (flash && q.kind === 'proc' && QUESTIONS.some(s => s.kind === 'step' && s.proc === q.proc && marked.has(s.id))));
+  else if (deck !== 'all') qs = qs.filter(q => q.kind === deck);
+  if (flash) qs = qs.filter(q => q.kind !== 'step');
+  if (topic !== 'all') qs = qs.filter(q => q.topic === topic);
+  return qs;
+}
+function topicsFor(deck) {
+  const seen = [];
+  for (const q of deckQuestions(deck, 'all')) if (!seen.includes(q.topic)) seen.push(q.topic);
+  return seen;
+}
+
+function startSession(list) {
+  const qs = list || shuffle(deckQuestions(prefs.deck, prefs.topic));
+  S = { order: qs, idx: 0, flipped: false, answers: {}, options: {}, right: 0, wrong: 0, missed: [], done: false };
+  render();
+}
+
+function current() { return S.order[S.idx]; }
+
+function go(delta) {
+  if (!S || !S.order.length) return;
+  const next = S.idx + delta;
+  if (next < 0) return;
+  if (next >= S.order.length) { S.done = true; render(); return; }
+  S.idx = next; S.flipped = false; render();
+}
+
+function grade(q, ok) {
+  if (S.answers[q.id] !== undefined) return;
+  S.answers[q.id] = ok;
+  if (ok) S.right++; else { S.wrong++; S.missed.push(q); if (prefs.autoMark) toggleMark(q.id, true); }
+}
+
+function choose(i) {
+  const q = current();
+  if (S.answers[q.id] !== undefined) return;
+  const opt = S.options[q.id][i];
+  if (!opt) return;
+  S.options[q.id].chosen = i;
+  grade(q, opt.correct);
+  render();
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+function updateDeckLabel() {
+  $('#deckSel').querySelector('option[value=marked]').textContent = `★ Marked for review (${marked.size})`;
+}
+
+function renderTopics() {
+  // The step deck only exists in multiple choice.
+  const flash = prefs.mode === 'flash';
+  $('#deckSel').querySelector('option[value=step]').disabled = flash;
+  if (flash && prefs.deck === 'step') prefs.deck = 'proc';
+  $('#deckSel').value = prefs.deck;
+  const sel = $('#topicSel');
+  const topics = topicsFor(prefs.deck);
+  if (prefs.topic !== 'all' && !topics.includes(prefs.topic)) prefs.topic = 'all';
+  sel.innerHTML = '<option value="all">All topics</option>' + topics.map(t => `<option>${t}</option>`).join('');
+  sel.value = prefs.topic;
+}
+
+function questionFront(q) {
+  if (q.kind === 'limit') {
+    return { tag: q.topic, tagCls: '', prompt: q.prompt, body: '' };
+  }
+  const h = procHeading(q.proc);
+  // Flashcards: procedure cards show only the title until flipped — no hints or steps.
+  if (prefs.mode === 'flash') return { tag: q.topic, tagCls: h.tagCls, prompt: h.title, body: '' };
+  if (q.kind === 'proc') {
+    return { tag: q.topic + ' · full checklist', tagCls: h.tagCls, prompt: h.title,
+      body: '<p class="hint" style="margin-top:0;text-align:left">Choose the correct checklist.</p>' };
+  }
+  return { tag: q.topic + ' · fill in the step', tagCls: h.tagCls, prompt: h.title,
+    body: renderSteps(q.proc.steps, { blank: q.stepIdx }) };
+}
+
+function render() {
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === prefs.mode));
+  $('#deckSel').value = prefs.deck;
+  $('#autoMark').checked = prefs.autoMark;
+  updateDeckLabel();
+
+  const stage = $('#stage');
+  const total = S.order.length;
+  $('#score').textContent = (S.right + S.wrong) ? `✓ ${S.right}  ✗ ${S.wrong}` : '';
+
+  if (!total) {
+    $('#progress').textContent = '';
+    $('#barFill').style.width = '0';
+    stage.innerHTML = `<div class="card"><div class="empty">${prefs.deck === 'marked'
+      ? 'No marked questions yet.<br>Tap ☆ on any question to save it for review.'
+      : 'No questions match this filter.'}</div></div>`;
+    return;
+  }
+
+  if (S.done) {
+    $('#progress').textContent = `Finished ${total} questions`;
+    $('#barFill').style.width = '100%';
+    const graded = S.right + S.wrong;
+    const pct = graded ? Math.round(100 * S.right / graded) : 0;
+    stage.innerHTML = `<div class="card summary">
+      <h2>Session complete</h2>
+      ${graded ? `<div class="score">${pct}%</div><p>${S.right} correct, ${S.wrong} missed of ${graded} graded.</p>` : '<p>No questions were graded this round.</p>'}
+      <div class="row">
+        <button class="btn primary" id="again">Start over</button>
+        ${S.missed.length ? `<button class="btn" id="redoMissed">Retry missed (${S.missed.length})</button>
+        <button class="btn" id="markMissed">★ Mark all missed</button>` : ''}
+      </div></div>`;
+    $('#again').onclick = () => startSession();
+    if (S.missed.length) {
+      $('#redoMissed').onclick = () => startSession(shuffle(S.missed));
+      $('#markMissed').onclick = e => { S.missed.forEach(q => toggleMark(q.id, true)); e.target.textContent = '★ Marked'; e.target.disabled = true; };
+    }
+    return;
+  }
+
+  const q = current();
+  $('#progress').textContent = `Question ${S.idx + 1} of ${total}`;
+  $('#barFill').style.width = `${100 * S.idx / total}%`;
+  const f = questionFront(q);
+  const isMarked = marked.has(q.id);
+  const star = `<button class="star ${isMarked ? 'on' : ''}" id="starBtn" title="Mark for review (M)" aria-label="Mark for review">${isMarked ? '★' : '☆'}</button>`;
+  const head = `<div class="tag ${f.tagCls}">${f.tag}</div><div class="prompt">${f.prompt}</div>`;
+  const answered = S.answers[q.id] !== undefined;
+
+  let html;
+  if (prefs.mode === 'flash') {
+    let back = '';
+    if (S.flipped) {
+      if (q.kind === 'limit') back = `<div class="answer"><div class="big">${q.answer}</div></div>`;
+      else if (q.kind === 'proc') back = `<div class="answer">${renderSteps(q.proc.steps)}</div>`;
+      else back = `<div class="answer"><div class="big">${q.answer}</div></div>`;
+    }
+    const body = q.kind === 'step' && S.flipped ? renderSteps(q.proc.steps, { blank: q.stepIdx, reveal: true }) : f.body;
+    html = `<div class="card flip" id="card">${star}${head}${body}${back}
+      ${S.flipped || q.kind !== 'limit' ? '' : '<div class="hint">Tap card or press Space to reveal</div>'}</div>
+      <div class="nav">
+        <button class="btn" id="prev" ${S.idx === 0 ? 'disabled' : ''}>← Prev</button>
+        <div class="mid">${S.flipped && !answered
+          ? '<button class="btn bad" id="gotWrong">✗ Missed it</button><button class="btn good" id="gotRight">✓ Knew it</button>'
+          : ''}</div>
+        <button class="btn ${S.flipped ? 'primary' : ''}" id="next">${S.idx === total - 1 ? 'Finish' : 'Next →'}</button>
+      </div>`;
+  } else {
+    if (!S.options[q.id]) S.options[q.id] = buildOptions(q);
+    const opts = S.options[q.id];
+    const chosen = opts.chosen;
+    const optHtml = opts.map((o, i) => {
+      let cls = 'opt';
+      if (answered && o.correct) cls += ' right';
+      else if (answered && i === chosen) cls += ' wrong';
+      return `<button class="${cls}" data-i="${i}" ${answered ? 'disabled' : ''}><span class="k">${i + 1}</span><span class="body">${o.html}</span></button>`;
+    }).join('');
+    const verdict = answered
+      ? `<div class="hint" style="color:var(${S.answers[q.id] ? '--good' : '--bad'});font-weight:600">${S.answers[q.id] ? 'Correct!' : 'Not quite — correct answer highlighted.'}</div>`
+      : '';
+    html = `<div class="card">${star}${head}${f.body}
+      <div class="opts">${optHtml}</div>${verdict}</div>
+      <div class="nav">
+        <button class="btn" id="prev" ${S.idx === 0 ? 'disabled' : ''}>← Prev</button>
+        <button class="btn ${answered ? 'primary' : ''}" id="next">${S.idx === total - 1 ? 'Finish' : (answered ? 'Next →' : 'Skip →')}</button>
+      </div>`;
+  }
+  stage.innerHTML = html;
+
+  $('#starBtn').onclick = e => { e.stopPropagation(); toggleMark(q.id); render(); };
+  $('#prev').onclick = () => go(-1);
+  $('#next').onclick = () => go(1);
+  if (prefs.mode === 'flash') {
+    $('#card').onclick = () => { S.flipped = !S.flipped; render(); };
+    if ($('#gotRight')) {
+      $('#gotRight').onclick = () => { grade(q, true); go(1); };
+      $('#gotWrong').onclick = () => { grade(q, false); go(1); };
+    }
+  } else {
+    stage.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(+b.dataset.i));
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Wiring
+// ---------------------------------------------------------------------------
+document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => {
+  prefs.mode = b.dataset.mode; renderTopics(); savePrefs(); startSession();
+});
+$('#deckSel').onchange = e => { prefs.deck = e.target.value; renderTopics(); savePrefs(); startSession(); };
+$('#topicSel').onchange = e => { prefs.topic = e.target.value; savePrefs(); startSession(); };
+$('#shuffleBtn').onclick = () => startSession();
+$('#autoMark').onchange = e => { prefs.autoMark = e.target.checked; savePrefs(); };
+$('#clearMarks').onclick = () => {
+  if (!marked.size || !confirm(`Clear all ${marked.size} marked questions?`)) return;
+  marked = new Set(); saveMarks();
+  if (prefs.deck === 'marked') startSession(); else render();
+};
+document.addEventListener('keydown', e => {
+  if (!S || S.done || !S.order.length || e.target.tagName === 'SELECT' || e.metaKey || e.ctrlKey || e.altKey) return;
+  const q = current();
+  if (e.key === 'ArrowRight') go(1);
+  else if (e.key === 'ArrowLeft') go(-1);
+  else if (e.key === 'm' || e.key === 'M') { toggleMark(q.id); render(); }
+  else if (prefs.mode === 'flash' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); S.flipped = !S.flipped; render(); }
+  else if (prefs.mode === 'mc' && /^[1-4]$/.test(e.key)) choose(+e.key - 1);
+  else if (prefs.mode === 'mc' && e.key === 'Enter' && S.answers[q.id] !== undefined) go(1);
+});
+
+renderTopics();
+startSession();
+</script>
+</body>
+</html>
